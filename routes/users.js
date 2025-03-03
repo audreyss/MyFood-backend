@@ -24,7 +24,7 @@ const validateSignIn = [
 router.post('/signup', validateSignIn, (req, res) => {
   // check errors for validation
   const result = validationResult(req);
-  if (result.notEmpty()) {
+  if (!result.isEmpty()) {
     return res.json({ result: false, error: result.array() });;
   }
 
@@ -47,7 +47,7 @@ router.post('/signup', validateSignIn, (req, res) => {
       // save new User 
       newUser.save()
         .then(data => {
-          res.json({ result: true, username: data.username })
+          res.json({ result: true, username: data.username, token: data.token })
         })
         .catch(error => res.json({ result: false, error }));
     })
