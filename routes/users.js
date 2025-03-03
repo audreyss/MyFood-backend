@@ -20,7 +20,7 @@ const validateSignUp = [
     .escape()
 ];
 
-
+// ROUTE POST /USERS/SIGNUP
 router.post('/signup', validateSignUp, (req, res) => {
   // check validation
   const result = validationResult(req);
@@ -64,6 +64,7 @@ const validateSignIn = [
     .matches(/^[a-zA-Z0-9!@#$%^&*]+$/).withMessage('Password contains not allowed characters.'),
 ];
 
+// ROUTE POST /USERS/SIGNIN
 router.post('/signin', validateSignIn, (req, res) => {
   // check validation
   const result = validationResult(req);
@@ -84,5 +85,34 @@ router.post('/signin', validateSignIn, (req, res) => {
     })
     .catch(error => res.json({ result: false, error }))
 })
+
+// ROUTE PUT /USERS/:TOKEN
+router.put('/:token', (req, res) => {
+  // get user's token and field's name to update
+  const token = req.params.token;
+  const field = req.body.field;
+
+  // check field is correct
+  const fields = ['fit', 'healthy', 'pregnant', 'glutenFree', 'vegetarian'];
+  if (!fields.includes(field)) {
+    return res.json({ result: false, error: 'Invalid field.' });
+  }
+
+  // find User with given token
+  User.findOne({ token })
+    .then(data => {
+      // if user not found: error
+      if (!data) {
+        return res.json({ result: false, error: 'Invalid token.' });
+      }
+
+      // get value of field
+      const value = data[field];
+      // update field's value in db: toggle value
+      User.updateOne({ token }, { [field]: !value })
+        .then(() => res.json({ result: true }))
+    })
+    .catch(error => res.json({ result: false, error }));
+});
 
 module.exports = router;
