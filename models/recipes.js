@@ -10,7 +10,7 @@ const recipeSchema = mongoose.Schema({
     name: String,
     picture: String,
     numberOfServings: Number,
-    fit: Boolean,
+    muscleGain: Boolean,
     healthy: Boolean,
     pregnant: Boolean,
     glutenFree: Boolean,

@@ -5,7 +5,7 @@ const userSchema = mongoose.Schema({
     password: String,
     email: String,
     token: String,
-    fit: {
+    muscleGain: {
         type: Boolean, 
         default: false,
     },
