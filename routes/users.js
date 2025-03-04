@@ -94,7 +94,7 @@ router.put('/diet/:token', (req, res) => {
   const field = req.body.field;
 
   // check field is correct
-  const fields = ['fit', 'healthy', 'pregnant', 'glutenFree', 'vegetarian'];
+  const fields = ['muscleGain', 'healthy', 'pregnant', 'glutenFree', 'vegetarian'];
   if (!fields.includes(field)) {
     return res.json({ result: false, error: 'Invalid field.' });
   }
