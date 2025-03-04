@@ -216,8 +216,4 @@ router.delete('/:token', validatePassword, (req, res) => {
     }).catch(error => res.json({ result: false, error }));
 });
 
-
-
-
-
 module.exports = router;
