@@ -54,6 +54,7 @@ router.post('/signup', validateSignUp, (req, res) => {
     .catch(error => res.json({ result: false, error }))
 });
 
+// validator for sign in
 const validateSignIn = [
   body('email')
     .notEmpty()
@@ -86,8 +87,8 @@ router.post('/signin', validateSignIn, (req, res) => {
     .catch(error => res.json({ result: false, error }))
 })
 
-// ROUTE PUT /USERS/:TOKEN
-router.put('/:token', (req, res) => {
+// ROUTE PUT /USERS/DIET/:TOKEN
+router.put('/diet/:token', (req, res) => {
   // get user's token and field's name to update
   const token = req.params.token;
   const field = req.body.field;
@@ -103,7 +104,7 @@ router.put('/:token', (req, res) => {
     .then(data => {
       // if user not found: error
       if (!data) {
-        return res.json({ result: false, error: 'Invalid token.' });
+        return res.json({ result: false, error: 'User not found.' });
       }
 
       // get value of field
@@ -114,5 +115,109 @@ router.put('/:token', (req, res) => {
     })
     .catch(error => res.json({ result: false, error }));
 });
+
+
+// validator for email
+const validateEmail = [
+  body('email')
+    .notEmpty()
+    .isEmail().withMessage('Not valid email.')
+    .normalizeEmail(),
+];
+
+// ROUTE PUT /USERS/EMAIL/:TOKEN
+router.put('/email/:token', validateEmail, (req, res) => {
+  // get user's token and new email
+  const token = req.params.token;
+  const newEmail = req.body.email;
+
+  // check validation
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res.json({ result: false, error: result.array() });
+  }
+
+  // Find user and update email
+  User.findOneAndUpdate({ token }, { email: newEmail })
+    .then((data) => {
+      // User not found
+      if (!data) {
+        return res.json({ result: false, error: 'User not found.' });
+      }
+      res.json({ result: true })
+    })
+    .catch(error => res.json({ result: false, error }));
+});
+
+
+// validator for password
+const validatePasswords = [
+  body('newPassword')
+    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long.')
+    .matches(/^[a-zA-Z0-9!@#$%^&*]+$/).withMessage('Password contains not allowed characters.'),
+  body('oldPassword')
+    .notEmpty().withMessage('Need old password.'),
+];
+
+// ROUTE PUT /USERS/PASSWORD/:TOKEN
+router.put('/password/:token', validatePasswords, (req, res) => {
+  // get user's token
+  const token = req.params.token;
+
+  // check validation
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res.json({ result: false, error: result.array() });
+  }
+
+  // find user and update password
+  User.findOne({ token })
+    .then(data => {
+      if (data && bcrypt.compareSync(req.body.oldPassword, data.password)) {
+        // hash new password
+        const hash = bcrypt.hashSync(req.body.newPassword, 10);
+        User.updateOne({ token }, { password: hash })
+          .then(() => res.json({ result: true }))
+      } else {
+        res.json({ result: false, error: 'User not found or wrong password.' })
+      }
+    }).catch(error => res.json({ result: false, error }));
+});
+
+// validator for password
+const validatePassword = [
+  body('password')
+    .notEmpty().withMessage('Need password.'),
+];
+
+// ROUTE PUT /USERS/PASSWORD/:TOKEN
+router.delete('/:token', validatePassword, (req, res) => {
+  // get user's token
+  const token = req.params.token;
+
+  // check validation
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res.json({ result: false, error: result.array() });
+  }
+
+  // find user 
+  User.findOne({ token })
+    .then(data => {
+      // check if user found and correct password
+      if (data && bcrypt.compareSync(req.body.password, data.password)) {
+        // delete user
+        User.deleteOne({ token })
+          .then(() => res.json({ result: true }))
+          .catch(error => res.json({ result: false, error }))
+      } else {
+        res.json({ result: false, error: 'User not found or wrong password.' })
+      }
+    }).catch(error => res.json({ result: false, error }));
+});
+
+
+
+
 
 module.exports = router;
