@@ -14,12 +14,13 @@ const recipeSchema = mongoose.Schema({
     healthy: Boolean,
     pregnant: Boolean,
     glutenFree: Boolean,
-    Vegetarian: Boolean,
+    vegetarian: Boolean,
     calories: Number,
     glucides: String,
     lipides: String,
     proteins: String,
     readyInMinutes: Number,
+    recipeContent: String,
     ingredients: [ingredientSchema]
 });
 
