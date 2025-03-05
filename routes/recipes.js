@@ -31,6 +31,10 @@ router.get('/search', (req, res) => {
     for (let opt in req.query) {
         const value = req.query[opt];
 
+        if (value == '') {
+            continue;
+        }
+
         if (opt == 'name') {
             // name query
             options['name'] = { $regex: new RegExp(value, "i") }
