@@ -15,9 +15,7 @@ const validateTokenRecipe = [
 
 const validateTokenParamRecipe = [
     param('token')
-        .notEmpty(),
-    body('recipe_id')
-        .notEmpty(),
+        .notEmpty()
 ];
 
 // ROUTE POST /BOOKMARKS/
