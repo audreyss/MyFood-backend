@@ -10,6 +10,7 @@ var usersRouter = require('./routes/users');
 var recipesRouter = require('./routes/recipes');
 var dietsRouter = require('./routes/diets');
 var ratingsRouter = require('./routes/ratings');
+var bookmarksRouter = require('./routes/bookmarks');
 
 var app = express();
 const cors = require('cors');
@@ -25,5 +26,6 @@ app.use('/users', usersRouter);
 app.use('/recipes', recipesRouter);
 app.use('/diets', dietsRouter);
 app.use('/ratings', ratingsRouter);
+app.use('/bookmarks', bookmarksRouter);
 
 module.exports = app;

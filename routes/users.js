@@ -190,7 +190,7 @@ const validatePassword = [
     .notEmpty().withMessage('Need password.'),
 ];
 
-// ROUTE PUT /USERS/PASSWORD/:TOKEN
+// ROUTE DELETE /USERS/:TOKEN
 router.delete('/:token', validatePassword, (req, res) => {
   // get user's token
   const token = req.params.token;
