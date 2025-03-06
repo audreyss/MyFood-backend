@@ -25,7 +25,7 @@ router.post('/signup', validateSignUp, (req, res) => {
   // check validation
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    return res.json({ result: false, error: result.array() });;
+    return res.json({ result: false, error: result.array()[0].msg });;
   }
 
   // check if another user with same email
@@ -70,7 +70,7 @@ router.post('/signin', validateSignIn, (req, res) => {
   // check validation
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    return res.json({ result: false, error: result.array() });
+    return res.json({ result: false, error: result.array()[0].msg });
   }
 
   // Check if user with same email exists
@@ -134,19 +134,26 @@ router.put('/email/:token', validateEmail, (req, res) => {
   // check validation
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    return res.json({ result: false, error: result.array() });
+    return res.json({ result: false, error: result.array()[0].msg });
   }
-
-  // Find user and update email
-  User.findOneAndUpdate({ token }, { email: newEmail })
-    .then((data) => {
-      // User not found
-      if (!data) {
-        return res.json({ result: false, error: 'User not found.' });
+  // check if another user exists with new email
+  User.findOne({ email: req.body.email })
+    .then(data => {
+      if (data) {
+        // another user with same email
+        return res.json({ result: false, error: 'User with given email already exists.' });
       }
-      res.json({ result: true })
+      // Find user and update email
+      User.findOneAndUpdate({ token }, { email: newEmail })
+        .then((data) => {
+          // User not found
+          if (!data) {
+            return res.json({ result: false, error: 'User not found.' });
+          }
+          res.json({ result: true })
+        })
+        .catch(error => res.json({ result: false, error }));
     })
-    .catch(error => res.json({ result: false, error }));
 });
 
 
@@ -167,7 +174,7 @@ router.put('/password/:token', validatePasswords, (req, res) => {
   // check validation
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    return res.json({ result: false, error: result.array() });
+    return res.json({ result: false, error: result.array()[0].msg });
   }
 
   // find user and update password
@@ -198,7 +205,7 @@ router.delete('/:token', validatePassword, (req, res) => {
   // check validation
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    return res.json({ result: false, error: result.array() });
+    return res.json({ result: false, error: result.array()[0].msg });
   }
 
   // find user 
