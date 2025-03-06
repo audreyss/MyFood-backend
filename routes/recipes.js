@@ -61,7 +61,7 @@ router.get('/search', (req, res) => {
         .catch(error => res.json({ result: false, error }))
 });
 
-// ROUTE GET /RECIPES/recipe/:id : get information of recipe with given id
+// ROUTE GET /RECIPES/RECIPE/:ID : get information of recipe with given id
 router.get('/recipe/:id', (req, res) => {
     // get recipe with _id = given id
     Recipe.find({ _id: req.params.id })

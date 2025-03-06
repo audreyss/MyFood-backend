@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var recipesRouter = require('./routes/recipes');
 var dietsRouter = require('./routes/diets');
+var bookmarksRouter = require('./routes/bookmarks');
 
 var app = express();
 const cors = require('cors');
@@ -23,5 +24,6 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/recipes', recipesRouter);
 app.use('/diets', dietsRouter);
+app.use('/bookmarks', bookmarksRouter);
 
 module.exports = app;
