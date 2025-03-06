@@ -17,11 +17,15 @@ router.get('/', (req, res) => {
         .catch(error => res.json({ result: false, error }))
 });
 
-// ROUTE GET ratings/:id : get rating by id
-router.get('/:id', (req, res) => {
-    Rating.find({ id_recipe: req.params.id })
-    .populate('id_user')
+// ROUTE GET ratings/:token : get rating of user with token = token
+router.get('/:token', (req, res) => {
+    Rating.find()
+        .populate('id_user')
         .then(data => {
+            console.log('route get ratings/:id BEFORE', data)
+            data = data.filter(rating => rating.id_user.token == req.params.token)
+                .map(rating => ({ id_recipe: rating.id_recipe, rating: rating.rating }))
+            console.log('route get ratings/:id AFTER', data)
             if (data) {
                 res.json({ result: true, ratings: data })
             } else {
@@ -42,15 +46,13 @@ router.post('/', (req, res) => {
                     rating: req.body.rating
                 });
                 newRating.save()
-                    .then((databis) => res.json({ result: true, databis }))
+                    .then(() => res.json({ result: true }))
             } else {
                 res.json({ result: false });
             }
         })
         .catch(error => res.json({ result: false, error }))
 });
-
-module.exports = router;
 
 // ROUTE PUT ratings/ : update rating
 router.put('/', (req, res) => {
@@ -64,4 +66,6 @@ router.put('/', (req, res) => {
             }
         })
         .catch(error => res.json({ result: false, error }))
-    });
+});
+
+module.exports = router;
