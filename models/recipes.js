@@ -21,7 +21,7 @@ const recipeSchema = mongoose.Schema({
     proteins: String,
     readyInMinutes: Number,
     recipeContent: String,
-    ingredients: [ingredientSchema]
+    ingredients: [ingredientSchema],
 });
 
 const Recipe = mongoose.model('recipes', recipeSchema);
