@@ -17,11 +17,13 @@ router.get('/', (req, res) => {
         .catch(error => res.json({ result: false, error }))
 });
 
-// ROUTE GET ratings/:id : get rating by id
-router.get('/:id', (req, res) => {
-    Rating.find({ id_recipe: req.params.id })
-    .populate('id_user')
+// ROUTE GET ratings/:token : get rating of user with token = token
+router.get('/:token', (req, res) => {
+    Rating.find()
+        .populate('id_user')
         .then(data => {
+            data = data.filter(rating => rating.id_user.token == req.params.token)
+                .map(rating => ({ id_recipe: rating.id_recipe, rating: rating.rating }))
             if (data) {
                 res.json({ result: true, ratings: data })
             } else {
@@ -42,7 +44,21 @@ router.post('/', (req, res) => {
                     rating: req.body.rating
                 });
                 newRating.save()
-                    .then((databis) => res.json({ result: true, databis }))
+                    .then(() => res.json({ result: true }))
+            } else {
+                res.json({ result: false });
+            }
+        })
+        .catch(error => res.json({ result: false, error }))
+});
+
+// ROUTE PUT ratings/ : update rating
+router.put('/', (req, res) => {
+    User.findOne({ token: req.body.token })
+        .then(data => {
+            if (data) {
+                Rating.findOneAndUpdate({ id_user: data._id, id_recipe: req.body.recipe_id }, { rating: req.body.rating }, { upsert: true })
+                    .then((rating) => res.json({ result: true, rating }))
             } else {
                 res.json({ result: false });
             }
@@ -51,17 +67,3 @@ router.post('/', (req, res) => {
 });
 
 module.exports = router;
-
-// ROUTE PUT ratings/ : update rating
-router.put('/', (req, res) => {
-    User.findOne({ token: req.body.token })
-        .then(data => {
-            if (data) {
-                Rating.findOneAndUpdate({ id_user: data._id, id_recipe: req.body.recipe_id }, { rating: req.body.rating })
-                    .then((rating) => res.json({ result: true, rating }))
-            } else {
-                res.json({ result: false });
-            }
-        })
-        .catch(error => res.json({ result: false, error }))
-    });

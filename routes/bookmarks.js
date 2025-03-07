@@ -55,7 +55,6 @@ router.get('/:token', validateTokenParamRecipe, (req, res) => {
     // find user with token
     User.findOne({ token: req.params.token })
         .then(data => {
-            console.log('find', data);
             if (data) {
                 // get all bookmarks of user
                 Bookmark.find({ id_user: data._id })
