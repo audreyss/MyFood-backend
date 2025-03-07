@@ -69,6 +69,40 @@ router.get('/:token', validateTokenParamRecipe, (req, res) => {
 });
 
 
+// ROUTE GET /BOOKMARKS/INFOS/:TOKEN
+// Get bookmarks, with additional informations, of user with given token
+router.get('/infos/:token', validateTokenParamRecipe, (req, res) => {
+    // check validation
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+        return res.json({ result: false, error: result.array()[0].msg });;
+    }
+
+    // find user with token
+    User.findOne({ token: req.params.token })
+        .then(data => {
+            if (data) {
+                // get all bookmarks of user
+                Bookmark.find({ id_user: data._id })
+                    .populate('id_recipe')
+                    .then(data => {
+                        const fields = ['pregnant', 'healthy', 'muscleGain', 'glutenFree', 'vegetarian']
+                        
+                        data = data.map(bk => ({
+                            _id: bk._id, id_user: bk.id_user, id_recipe: bk.id_recipe._id, recipe_name: bk.id_recipe.name,
+                            pregnant: bk.id_recipe.pregnant, healthy: bk.id_recipe.healthy, muscleGain: bk.id_recipe.muscleGain,
+                            glutenFree: bk.id_recipe.glutenFree, vegetarian: bk.id_recipe.vegetarian
+                        }))
+                        res.json({ result: true, bookmarks: data })
+                    });
+            } else {
+                res.json({ result: false, error: 'User not found.' });
+            }
+        })
+        .catch(error => res.json({ result: false, error }))
+});
+
+
 // ROUTE DELETE /BOOKMARKS/
 // Delete bookmark of user with given token
 router.delete('/', validateTokenRecipe, (req, res) => {
