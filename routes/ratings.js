@@ -22,10 +22,8 @@ router.get('/:token', (req, res) => {
     Rating.find()
         .populate('id_user')
         .then(data => {
-            console.log('route get ratings/:id BEFORE', data)
             data = data.filter(rating => rating.id_user.token == req.params.token)
                 .map(rating => ({ id_recipe: rating.id_recipe, rating: rating.rating }))
-            console.log('route get ratings/:id AFTER', data)
             if (data) {
                 res.json({ result: true, ratings: data })
             } else {
@@ -59,7 +57,7 @@ router.put('/', (req, res) => {
     User.findOne({ token: req.body.token })
         .then(data => {
             if (data) {
-                Rating.findOneAndUpdate({ id_user: data._id, id_recipe: req.body.recipe_id }, { rating: req.body.rating })
+                Rating.findOneAndUpdate({ id_user: data._id, id_recipe: req.body.recipe_id }, { rating: req.body.rating }, { upsert: true })
                     .then((rating) => res.json({ result: true, rating }))
             } else {
                 res.json({ result: false });
