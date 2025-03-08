@@ -11,3 +11,11 @@ it("GET /diets", async () => {
   //We could also do res.body.diets[0].name("Healthy") to check diet name (ThunderClient)
   expect(res.body.result).toEqual(true);
 });
+
+it("GET /diets", async () => {
+  const res = await request(app).get("/diets");
+
+  expect(res.statusCode).toBe(200);
+
+  expect(res.body.diets.length).toBeGreaterThanOrEqual(5);
+});
