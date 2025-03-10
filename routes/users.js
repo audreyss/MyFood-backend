@@ -6,6 +6,8 @@ const { body, validationResult } = require("express-validator");
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
+const fields = ['muscleGain', 'healthy', 'pregnant', 'glutenFree', 'vegetarian'];
+
 // validator for sign up
 const validateSignUp = [
   body('email')
@@ -78,7 +80,10 @@ router.post('/signin', validateSignIn, (req, res) => {
     .then(data => {
       // check if user found has same password
       if (data && bcrypt.compareSync(req.body.password, data.password)) {
-        res.json({ result: true, username: data.username, token: data.token })
+        const result = { result: true, username: data.username, token: data.token };
+        fields.forEach(field => result[field] = data[field]);
+
+        res.json(result);
       } else {
         // no user found or wrong password
         res.json({ result: false, error: 'User not found or wrong password.' })
@@ -94,7 +99,6 @@ router.put('/diet/:token', (req, res) => {
   const field = req.body.field;
 
   // check field is correct
-  const fields = ['muscleGain', 'healthy', 'pregnant', 'glutenFree', 'vegetarian'];
   if (!fields.includes(field)) {
     return res.json({ result: false, error: 'Invalid field.' });
   }
