@@ -87,7 +87,7 @@ router.get('/infos/:token', validateTokenParamRecipe, (req, res) => {
                     .populate('id_recipe')
                     .then(data => {
                         data = data.map(bk => ({
-                            _id: bk._id, id_user: bk.id_user, id_recipe: bk.id_recipe._id, recipe_name: bk.id_recipe.name,
+                            _id: bk._id, id_user: bk.id_user, id_recipe: bk.id_recipe._id, recipe_name: bk.id_recipe.name, recipe_picture: bk.id_recipe.picture,
                             pregnant: bk.id_recipe.pregnant, healthy: bk.id_recipe.healthy, muscleGain: bk.id_recipe.muscleGain,
                             glutenFree: bk.id_recipe.glutenFree, vegetarian: bk.id_recipe.vegetarian
                         }))

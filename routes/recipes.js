@@ -11,7 +11,7 @@ router.get('/all', (req, res) => {
                 // keep certains fields of recipe
                 const recipes = data.map((recipe) => ({
                     id: recipe._id, name: recipe.name, healthy: recipe.healthy, vegetarian: recipe.vegetarian,
-                    glutenFree: recipe.glutenFree, pregnant: recipe.pregnant, muscleGain: recipe.muscleGain
+                    glutenFree: recipe.glutenFree, pregnant: recipe.pregnant, muscleGain: recipe.muscleGain, picture: recipe.picture,
                 }))
                 res.json({ result: true, number: recipes.length, recipes })
             } else {
@@ -54,7 +54,7 @@ router.get('/search', (req, res) => {
             // keep certains fields of recipe
             const recipes = data.map((recipe) => ({
                 id: recipe._id, name: recipe.name, healthy: recipe.healthy, vegetarian: recipe.vegetarian,
-                glutenFree: recipe.glutenFree, pregnant: recipe.pregnant, muscleGain: recipe.muscleGain
+                glutenFree: recipe.glutenFree, pregnant: recipe.pregnant, muscleGain: recipe.muscleGain, picture: recipe.picture
             }))
             res.json({ result: true, number: recipes.length, recipes })
         })
