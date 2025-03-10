@@ -111,10 +111,16 @@ router.put('/diet/:token', (req, res) => {
         return res.json({ result: false, error: 'User not found.' });
       }
 
+      // put all fields to false then change the given field to true 
+      // (allow only one value to true)
+      const val = {};
+      fields.forEach(f => val[f] = false);
+      val[field] = true;
+
       // get value of field
       const value = data[field];
-      // update field's value in db: toggle value
-      User.updateOne({ token }, { [field]: !value })
+      // update field's value in db: true
+      User.updateOne({ token }, val)
         .then(() => res.json({ result: true }))
     })
     .catch(error => res.json({ result: false, error }));
