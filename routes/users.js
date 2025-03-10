@@ -110,17 +110,45 @@ router.put('/diet/:token', (req, res) => {
       if (!data) {
         return res.json({ result: false, error: 'User not found.' });
       }
+      
+      // get value of field
+      const value = data[field];
+      // update field's value in db: toggle value
+      User.updateOne({ token }, {[field]: !value})
+        .then(() => res.json({ result: true }))
+    })
+    .catch(error => res.json({ result: false, error }));
+});
+
+// ROUTE PUT /USERS/DIETS/:TOKEN
+router.put('/diets/:token', (req, res) => {
+  // get user's token and fields to update
+  const token = req.params.token;
+  const fieldsBody = req.body.fields.split(',');
+
+  // check fields are correct
+  for (let field of fieldsBody) {
+    if (!fields.includes(field)) {
+      return res.json({ result: false, error: 'Invalid field.' });
+    }
+  };
+
+  // find User with given token
+  User.findOne({ token })
+    .then(data => {
+      // if user not found: error
+      if (!data) {
+        return res.json({ result: false, error: 'User not found.' });
+      }
 
       // put all fields to false then change the given field to true 
       // (allow only one value to true)
-      const val = {};
-      fields.forEach(f => val[f] = false);
-      val[field] = true;
+      const toUpdate = {};
+      fields.forEach(f => toUpdate[f] = false);
+      fieldsBody.forEach(f => toUpdate[f] = true);
 
-      // get value of field
-      const value = data[field];
-      // update field's value in db: true
-      User.updateOne({ token }, val)
+      // update fields value in db: true
+      User.updateOne({ token }, toUpdate)
         .then(() => res.json({ result: true }))
     })
     .catch(error => res.json({ result: false, error }));
