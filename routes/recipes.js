@@ -28,7 +28,7 @@ router.get('/all', (req, res) => {
 // diets: vegetarian, pregnant, glutenFree, muscleGain, healthy
 router.get('/search', async (req, res) => {
     let options = {};
-    let ingredientsOpt = [];
+    let ingredientNames = [];
     // loop on req.query
     for (let opt in req.query) {
         const value = req.query[opt];
@@ -47,7 +47,7 @@ router.get('/search', async (req, res) => {
         } else if (opt == 'ingredients') {
             // ingredients query
             for (let ingredient of value.split(',')) {
-                ingredientsOpt.push(ingredient);
+                ingredientNames.push(ingredient.toLowerCase().trim());
             }
         } else {
             // unknown query
@@ -55,15 +55,24 @@ router.get('/search', async (req, res) => {
         }
     }
 
-    if (ingredientsOpt.length > 0) {
-        const ingredient = await RecipeIngredient.findOne({ name: { $regex: new RegExp(ingredientsOpt[0], "i") } });
-        console.log(ingredient);
-        if (!ingredient) {
+    // if request by ingredients, add a filter on recipe id in options, else do nothing
+    if (ingredientNames.length > 0) {
+        // find ingredients with name in ingredientNames
+        const ingredients = await RecipeIngredient.find({ name: { $in: ingredientNames } });
+        // if no ingredient: return an empty array
+        if (ingredients.length == 0) {
             return res.json({ result: true, number: 0, recipes: [] });
         }
-        options['_id'] = { $in: ingredient.id_recipes };
-    }
 
+        // get array of id_recipes for each ingredient
+        const recipeIdsArrays = ingredients.map(ingredient => ingredient.id_recipes);
+        // keep common ids 
+        const commonRecipeIds = recipeIdsArrays.reduce((acc, ids) =>
+            acc.filter(id => ids.includes(id.toString()))
+        );
+        // add option
+        options['_id'] = { $in: Array.from(commonRecipeIds) };
+    }
 
     // get recipes with given options
     Recipe.find(options)
