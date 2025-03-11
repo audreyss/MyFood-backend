@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const Recipe = require('../models/recipes');
+const RecipeIngredient = require('../models/recipeIngredients');
 
 // ROUTE GET /RECIPES/ALL: get all recipes
 router.get('/all', (req, res) => {
@@ -25,8 +26,9 @@ router.get('/all', (req, res) => {
 // example: http://localhost:3000/recipes/search?diets=vegetarian,glutenFree&name=soup
 // query parameter: name and diets
 // diets: vegetarian, pregnant, glutenFree, muscleGain, healthy
-router.get('/search', (req, res) => {
+router.get('/search', async (req, res) => {
     let options = {};
+    let ingredientsOpt = [];
     // loop on req.query
     for (let opt in req.query) {
         const value = req.query[opt];
@@ -34,7 +36,6 @@ router.get('/search', (req, res) => {
         if (value == '') {
             continue;
         }
-
         if (opt == 'name') {
             // name query
             options['name'] = { $regex: new RegExp(value, "i") }
@@ -43,11 +44,27 @@ router.get('/search', (req, res) => {
             for (let diet of value.split(',')) {
                 options[diet] = true;
             }
+        } else if (opt == 'ingredients') {
+            // ingredients query
+            for (let ingredient of value.split(',')) {
+                ingredientsOpt.push(ingredient);
+            }
         } else {
             // unknown query
             return res.json({ result: false, error: "Invalid value for query parameter." })
         }
     }
+
+    if (ingredientsOpt.length > 0) {
+        const ingredient = await RecipeIngredient.findOne({ name: { $regex: new RegExp(ingredientsOpt[0], "i") } });
+        console.log(ingredient);
+        if (!ingredient) {
+            return res.json({ result: true, number: 0, recipes: [] });
+        }
+        options['_id'] = { $in: ingredient.id_recipes };
+    }
+
+
     // get recipes with given options
     Recipe.find(options)
         .then(data => {

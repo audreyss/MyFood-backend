@@ -8,6 +8,6 @@ const recipeIngredientSchema = mongoose.Schema({
     }]
 });
 
-const RecipeIngredient = mongoose.model('recipeIngredients', recipeIngredientSchema);
+const RecipeIngredient = mongoose.model('recipe_ingredients', recipeIngredientSchema);
 
 module.exports = RecipeIngredient;
