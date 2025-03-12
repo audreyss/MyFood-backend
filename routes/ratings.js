@@ -22,10 +22,10 @@ router.get('/:token', (req, res) => {
     Rating.find()
         .populate('id_user')
         .then(data => {
-            data = data.filter(rating => rating.id_user.token == req.params.token)
-                .map(rating => ({ id_recipe: rating.id_recipe, rating: rating.rating }))
-            if (data) {
-                res.json({ result: true, ratings: data })
+            if (data.length) {
+                const dataFilter = data.filter(rating => rating.id_user.token == req.params.token)
+                    .map(rating => ({ id_recipe: rating.id_recipe, rating: rating.rating }))
+                res.json({ result: true, ratings: dataFilter })
             } else {
                 res.json({ result: false });
             }
